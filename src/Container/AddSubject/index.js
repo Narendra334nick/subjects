@@ -1,21 +1,22 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import InputField from '../../Components/InputField/index';
+import { connect } from 'react-redux';
+import { addSubject } from '../../Utils/Redux/Subjects/subjectActions';
 
-export default function Index(props) {
-  const { subjects, setSubjects } = props;
+function Index(props) {
+  const { subject,addSubject } = props;
   const [subjectName, setSubjectName] = React.useState();
   const handleAdd = () => {
     if (subjectName) {
-      let arr = [...subjects];
+      let arr = [...subject];
       let id = Date.now();
       arr.push({
         Id: id,
         Name: subjectName,
         flag:false
       });
-      console.log("arr",arr);
-			setSubjects(arr)
+      addSubject(arr);
     } else {
       console.log('Enter Subject Name');
     }
@@ -36,3 +37,17 @@ export default function Index(props) {
     </Box>
   );
 }
+
+const mapStateToProps = (state) => {
+  return {
+    subject: state.subject.subject,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addSubject : (arr) => dispatch(addSubject(arr)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Index);

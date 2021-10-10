@@ -12,6 +12,8 @@ import { makeStyles } from '@mui/styles';
 import DialogBox from '../../Components/DialogBox/index';
 import InputField from '../../Components/InputField/index';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import { connect } from 'react-redux';
+import { addNote } from '../../Utils/Redux/Notes/notesAction';
 
 const useStayles = makeStyles((theme) => ({
   pointer: {
@@ -19,10 +21,9 @@ const useStayles = makeStyles((theme) => ({
   },
 }));
 
-export default function Index(props) {
+function Index(props) {
   const classes = useStayles();
-
-  const { notesId, notes, setNotes } = props;
+  const { notesId, notes, addNotes } = props;
   const [note, setNote] = React.useState([]);
   const [noteName, setNoteName] = React.useState();
   const [id, setId] = React.useState();
@@ -55,6 +56,7 @@ export default function Index(props) {
   };
 
   const handleSubmit = () => {
+    console.log("handle submit");
     if (noteName) {
       let newNotes = [...notes];
       let Id = Date.now();
@@ -63,17 +65,17 @@ export default function Index(props) {
         ParentId: id,
         Name: noteName,
       });
-      setNotes(newNotes);
+      console.log("newNotes",newNotes);
+      addNotes(newNotes);
       handleClose();
     } else {
       console.log('Enter Topics Name');
     }
   };
 
-  const deleteNote = (index) => {
-    let newNotes = [...notes];
-    newNotes.splice(index, 1);
-    setNotes(newNotes);
+  const deleteNote = (id) => {
+    let newNotes = notes.filter(item=>item.Id !==id);
+    addNotes(newNotes);
   };
 
   return (
@@ -110,7 +112,7 @@ export default function Index(props) {
                     </ListItemButton>
                     <ListItemIcon>
                       <HighlightOffIcon
-                        onClick={() => deleteNote(index)}
+                        onClick={() => deleteNote(item.Id)}
                         className={classes.pointer}
                       />
                     </ListItemIcon>
@@ -140,3 +142,17 @@ export default function Index(props) {
     </Box>
   );
 }
+
+const mapStateToProps = (state) => {
+  return {
+    notes: state.notes.notes,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addNotes : (arr) => dispatch(addNote(arr)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Index);

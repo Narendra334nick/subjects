@@ -17,6 +17,11 @@ import DialogBox from '../DialogBox/index';
 import InputField from '../InputField/index';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { SpeakerNotes } from '@mui/icons-material';
+import { connect } from 'react-redux';
+import { addSubject } from '../../Utils/Redux/Subjects/subjectActions';
+import { addTopic } from '../../Utils/Redux/Topics/topicActions';
+
+
 
 const useStayles = makeStyles((theme) => ({
   pointer: {
@@ -24,9 +29,9 @@ const useStayles = makeStyles((theme) => ({
   },
 }));
 
-export default function NestedList(props) {
+function NestedList(props) {
   const classes = useStayles();
-  const { arr, setSubjects, topics, setTopic , setNotesId } = props;
+  const { subject, setNotesId , addSubject , addTopic , topic } = props;
   const [topicName, setTopicName] = React.useState();
   const [id, setId] = React.useState();
 
@@ -40,37 +45,32 @@ export default function NestedList(props) {
   };
 
   const handleClick = (index) => {
-    let newArr = [...arr];
+    let newArr = [...subject];
     newArr[index].flag = !newArr[index].flag;
-    setSubjects(newArr);
-  };
-
-  const getTopics = () => {
-    console.log('get topics');
+    addSubject(newArr);
   };
 
   const deleteSubject = (index) => {
-    let newArr = [...arr];
+    let newArr = [...subject];
     newArr.splice(index, 1);
-    setSubjects(newArr);
+    addSubject(newArr);
   };
 
   const addTopics = (Id) => {
-    console.log('add topics', Id);
     handleClickOpen(Id);
     setId(Id);
   };
 
   const handleSubmit = () => {
     if (topicName) {
-      let newTopic = [...topics];
+      let newTopic = [...topic];
       let Id = Date.now();
       newTopic.push({
         Id: Id,
         ParentId: id,
         Name: topicName,
       });
-      setTopic(newTopic);
+      addTopic(newTopic);
       handleClose();
     } else {
       console.log('Enter Topics Name');
@@ -78,7 +78,7 @@ export default function NestedList(props) {
   };
 
   const getListOfTopic = (id) => {
-    const filterArray = topics.filter((item) => item.ParentId === id);
+    const filterArray = topic.filter((item) => item.ParentId === id);
     return filterArray ? filterArray : [];
   };
   const seeNotes=(id)=>{
@@ -96,8 +96,8 @@ export default function NestedList(props) {
           </ListSubheader>
         }
       >
-        {arr &&
-          arr.map((item, index) => {
+        {subject &&
+          subject.map((item, index) => {
             return (
               <>
                 <Box
@@ -170,3 +170,19 @@ export default function NestedList(props) {
     </Box>
   );
 }
+
+const mapStateToProps = (state) => {
+  return {
+    subject: state.subject.subject,
+    topic : state.topic.topic
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addSubject : (arr) => dispatch(addSubject(arr)),
+    addTopic : (arr) => dispatch(addTopic(arr))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(NestedList)
